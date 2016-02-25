@@ -7,7 +7,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * @author Vitaliy Grinyov
- * @since 2016.
+ * @since 2016
+ *
+ * Root configuration.
  */
 @Configuration
 @ComponentScan(basePackages={"com.grinyov.bulletinboard"},
