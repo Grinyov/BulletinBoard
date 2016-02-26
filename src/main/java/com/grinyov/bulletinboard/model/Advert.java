@@ -17,15 +17,12 @@ public class Advert implements Serializable{
     private long id;
     private Account account;
     private Category category;
-
-    @NotNull(message = "title can't be empty")
-    @Size(min = 10, max = 30, message = "title size must be between 10 and 30 characters long")
+    @NotNull(message = "Title can't be empty.")
+    @Size(min = 10, max = 30, message = "Title size must be between 10 and 30 characters long.")
     private String title;
-
-    @NotNull(message = "advert can't be empty")
-    @Size(min = 20, max = 400, message = "message size must be between 20 and 400 characters long")
+    @NotNull(message = "Advert can't be empty")
+    @Size(min = 20, max = 400, message = "Message size must be between 20 and 400 characters long.")
     private String text;
-
     Timestamp publication;
 
     public Advert(){}
