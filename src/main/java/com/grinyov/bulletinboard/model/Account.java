@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class Account implements Serializable {
 
 
-    private static final long serialVersionUID = -9026720641895792608L;
+    private static final long serialVersionUID = 409793453581901624L;
     private long id;
     @NotNull(message = "Name can't be empty.")
     @Size(min = 3, max = 255, message = "Your name must be between 3 and 255 characters long.")
