@@ -27,13 +27,14 @@ public class Advert implements Serializable{
 
     public Advert(){}
 
-    public Advert(Account account, Category category, String title, String text, Timestamp publication, long id) {
+    public Advert(long id, Account account, Category category, String title, String text, Timestamp publication) {
+
+        this.id = id;
         this.account = account;
         this.category = category;
         this.title = title;
         this.text = text;
         this.publication = publication;
-        this.id = id;
     }
 
     public long getId() {
