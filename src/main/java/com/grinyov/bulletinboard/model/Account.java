@@ -15,7 +15,6 @@ import java.io.Serializable;
  */
 public class Account implements Serializable {
 
-
     private static final long serialVersionUID = 409793453581901624L;
     private long id;
     @NotNull(message = "Name can't be empty.")

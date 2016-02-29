@@ -12,7 +12,6 @@ import java.io.Serializable;
  */
 public class Category implements Serializable{
 
-
     private static final long serialVersionUID = -2371179084452708204L;
     private long id;
     @NotNull(message = "Name category can't be empty.")
