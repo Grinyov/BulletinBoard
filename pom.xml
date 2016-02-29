@@ -13,7 +13,7 @@
         <java.version>1.8</java.version>
         <springframework.version>4.1.7.RELEASE</springframework.version>
         <spring-security>4.0.3.RELEASE</spring-security>
-        <hibernate-jpa>1.0.0.Final</hibernate-jpa>
+        <hibernate.version>5.1.0.Final</hibernate.version>
         <commons-dbcp2>2.1.1</commons-dbcp2>
         <mysql-connector-java>5.1.30</mysql-connector-java>
         <javax.servlet-api>3.0.1</javax.servlet-api>
@@ -136,9 +136,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>${hibernate-jpa}</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
 
         <dependency>
@@ -196,6 +202,11 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${springframework.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${springframework.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
