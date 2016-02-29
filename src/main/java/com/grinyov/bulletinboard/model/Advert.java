@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 /**
  * @author Vitaliy Grinyov
  * @since 2016
- *
+ * <p/>
  * Entity used to store information about ads.
  */
 @Entity
@@ -21,7 +21,7 @@ import java.sql.Timestamp;
         @NamedQuery(name = "Advert.findByCategory", query = "SELECT a FROM Advert a " +
                 "WHERE a.category.id = :categoryId AND a.top = FALSE"),
         @NamedQuery(name = "Advert.findById", query = "SELECT a FROM Advert a WHERE a.id = :id")})
-public class Advert implements Serializable{
+public class Advert implements Serializable {
 
     private static final long serialVersionUID = 6935513514218522345L;
 
@@ -38,7 +38,8 @@ public class Advert implements Serializable{
     @Column(name = "time", nullable = false, insertable = true, updatable = true)
     Timestamp publication;
 
-    public Advert(){}
+    public Advert() {
+    }
 
     public Advert(long id, Account account, Category category, String title, String text, Timestamp publication) {
 
@@ -49,6 +50,7 @@ public class Advert implements Serializable{
         this.text = text;
         this.publication = publication;
     }
+
     @Id
     @GeneratedValue
     @Column(name = "announcement_id", nullable = false, insertable = true, updatable = true)
@@ -59,6 +61,7 @@ public class Advert implements Serializable{
     public void setId(long id) {
         this.id = id;
     }
+
     @ManyToOne
     @JoinColumn(name = "account_id")
     public Account getAccount() {
@@ -68,6 +71,7 @@ public class Advert implements Serializable{
     public void setAccount(Account account) {
         this.account = account;
     }
+
     @OneToOne
     @JoinColumn(name = "category_id")
     public Category getCategory() {
@@ -77,6 +81,7 @@ public class Advert implements Serializable{
     public void setCategory(Category category) {
         this.category = category;
     }
+
     @Column(name = "title", nullable = false, insertable = true, updatable = true)
     public String getTitle() {
         return title;
@@ -85,6 +90,7 @@ public class Advert implements Serializable{
     public void setTitle(String title) {
         this.title = title;
     }
+
     @Column(name = "text", nullable = false, insertable = true, updatable = true)
     public String getText() {
         return text;
@@ -93,7 +99,8 @@ public class Advert implements Serializable{
     public void setText(String text) {
         this.text = text;
     }
-    @Basic
+
+    @Version
     @Column(name = "time", nullable = false, insertable = true, updatable = true)
     public Timestamp getPublication() {
         return publication;
