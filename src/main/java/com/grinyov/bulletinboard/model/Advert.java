@@ -1,5 +1,6 @@
 package com.grinyov.bulletinboard.model;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -11,9 +12,19 @@ import java.sql.Timestamp;
  *
  * Entity used to store information about ads.
  */
+@Entity
+@Table(name = "ads", schema = "", catalog = "bulletin_board")
+@NamedQueries({
+        @NamedQuery(name = "Advert.findAll", query = "SELECT a FROM Advert a"),
+        @NamedQuery(name = "Advert.findByPattern", query = "SELECT a FROM Advert a WHERE a.shortDesc " +
+                "LIKE :pattern OR a.contact.name LIKE :pattern"),
+        @NamedQuery(name = "Advert.findByCategory", query = "SELECT a FROM Advert a " +
+                "WHERE a.category.id = :categoryId AND a.top = FALSE"),
+        @NamedQuery(name = "Advert.findById", query = "SELECT a FROM Advert a WHERE a.id = :id")})
 public class Advert implements Serializable{
 
     private static final long serialVersionUID = 6935513514218522345L;
+
     private long id;
     private Account account;
     private Category category;
@@ -23,6 +34,8 @@ public class Advert implements Serializable{
     @NotNull(message = "Advert can't be empty")
     @Size(min = 20, max = 400, message = "Message size must be between 20 and 400 characters long.")
     private String text;
+    @Basic
+    @Column(name = "time", nullable = false, insertable = true, updatable = true)
     Timestamp publication;
 
     public Advert(){}
@@ -36,7 +49,9 @@ public class Advert implements Serializable{
         this.text = text;
         this.publication = publication;
     }
-
+    @Id
+    @GeneratedValue
+    @Column(name = "announcement_id", nullable = false, insertable = true, updatable = true)
     public long getId() {
         return id;
     }
@@ -44,7 +59,8 @@ public class Advert implements Serializable{
     public void setId(long id) {
         this.id = id;
     }
-
+    @ManyToOne
+    @JoinColumn(name = "account_id")
     public Account getAccount() {
         return account;
     }
@@ -52,7 +68,8 @@ public class Advert implements Serializable{
     public void setAccount(Account account) {
         this.account = account;
     }
-
+    @OneToOne
+    @JoinColumn(name = "category_id")
     public Category getCategory() {
         return category;
     }
@@ -60,7 +77,7 @@ public class Advert implements Serializable{
     public void setCategory(Category category) {
         this.category = category;
     }
-
+    @Column(name = "title", nullable = false, insertable = true, updatable = true)
     public String getTitle() {
         return title;
     }
@@ -68,7 +85,7 @@ public class Advert implements Serializable{
     public void setTitle(String title) {
         this.title = title;
     }
-
+    @Column(name = "text", nullable = false, insertable = true, updatable = true)
     public String getText() {
         return text;
     }
@@ -76,7 +93,8 @@ public class Advert implements Serializable{
     public void setText(String text) {
         this.text = text;
     }
-
+    @Basic
+    @Column(name = "time", nullable = false, insertable = true, updatable = true)
     public Timestamp getPublication() {
         return publication;
     }

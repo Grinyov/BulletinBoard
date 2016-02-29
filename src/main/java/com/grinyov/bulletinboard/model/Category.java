@@ -1,5 +1,6 @@
 package com.grinyov.bulletinboard.model;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -10,6 +11,12 @@ import java.io.Serializable;
  *
  * Entity used to store information about categories.
  */
+@Entity
+@Table(name = "categories", schema = "", catalog = "bulletin_board")
+@NamedQueries({
+@NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c"),
+@NamedQuery(name = "Category.findById", query = "SELECT c FROM Category c WHERE c.categoryId = :categoryId")}
+)
 public class Category implements Serializable{
 
     private static final long serialVersionUID = -2371179084452708204L;
@@ -24,7 +31,8 @@ public class Category implements Serializable{
         this.id = id;
         this.name = name;
     }
-
+    @Basic
+    @Column(name = "name", nullable = false, insertable = true, updatable = true)
     public String getName() {
         return name;
     }
@@ -32,7 +40,9 @@ public class Category implements Serializable{
     public void setName(String name) {
         this.name = name;
     }
-
+    @Id
+    @GeneratedValue
+    @Column(name = "category_id", nullable = false, insertable = true, updatable = true)
     public long getId() {
         return id;
     }
