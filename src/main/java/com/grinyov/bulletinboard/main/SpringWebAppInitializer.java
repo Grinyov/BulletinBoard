@@ -1,6 +1,8 @@
 package com.grinyov.bulletinboard.main;
 
 import com.grinyov.bulletinboard.config.DataConfig;
+import com.grinyov.bulletinboard.config.RootConfig;
+import com.grinyov.bulletinboard.config.SecurityConfig;
 import com.grinyov.bulletinboard.config.WebConfig;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -19,7 +21,7 @@ public class SpringWebAppInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-        appContext.register(DataConfig.class, WebConfig.class);
+        appContext.register(SecurityConfig.class, RootConfig.class, DataConfig.class, WebConfig.class);
 
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
                 "SpringDispatcher", new DispatcherServlet(appContext));

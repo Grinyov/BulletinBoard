@@ -13,7 +13,7 @@
     <!-- Enables the Spring MVC @Controller programming model -->
        <annotation-driven />
 
-       <context:component-scan base-package="com.altronica.gv.registration" />
+       <context:component-scan base-package="com.grinyov.bulletinboard" />
 
 
        <beans:bean
