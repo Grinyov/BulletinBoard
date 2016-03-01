@@ -29,12 +29,17 @@ public class AdvertDaoImpl implements AdvertDao{
     }
 
     @Override
-    public List<Advert> getAdsByCategoryId() {
+    public List<Advert> getAdsByCategoryId(int categoryId) {
         return null;
     }
 
     @Override
-    public boolean addAdvert() {
+    public Advert getAdvertById(int id) {
+        return null;
+    }
+
+    @Override
+    public boolean addAdvert(Advert advert) {
         return false;
     }
 

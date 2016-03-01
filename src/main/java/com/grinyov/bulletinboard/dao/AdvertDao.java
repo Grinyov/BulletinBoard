@@ -10,8 +10,9 @@ import java.util.List;
  */
 public interface AdvertDao {
     List<Advert> getAllAds();
-    List<Advert> getAdsByCategoryId();
-    boolean addAdvert();
+    List<Advert> getAdsByCategoryId(int categoryId);
+    Advert getAdvertById(int id);
+    boolean addAdvert(Advert advert);
     List<Advert> searchAdvert(String pattern);
     boolean deleteAdvert(long id);
 }

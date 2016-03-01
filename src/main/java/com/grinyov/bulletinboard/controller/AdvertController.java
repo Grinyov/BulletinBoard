@@ -7,16 +7,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.*;
 import java.util.List;
+import java.util.Set;
 
-im
 
 /**
  * @author Vitaliy Grinyov
@@ -38,36 +41,26 @@ public class AdvertController {
     }
 
     @RequestMapping(value = "ads")
-    public ModelAndView listAccounts(ModelAndView model) throws NoSuchAdvertException {
+    public ModelAndView listAds(ModelAndView model) throws NoSuchAdvertException {
         List<Advert> ads = advertDao.getAllAds();
         model.addObject("ads", ads);
         model.setViewName("ads");
         return model;
     }
 
-    /*
-
-    @RequestMapping(value = "accounts")
-    public ModelAndView listAccounts(ModelAndView model) throws IOException{
-        List<Account> accounts = accountDao.list();
-        model.addObject("accounts", accounts);
-        model.setViewName("admin/accounts");
+    @RequestMapping(value = "ads/newAdvert", method = RequestMethod.GET)
+    public ModelAndView newAdvert(ModelAndView model){
+        Advert advert = new Advert();
+        model.addObject("advert", advert);
+        model.setViewName("advertForm");
         return model;
     }
 
-    @RequestMapping(value = "accounts/newAccount", method = RequestMethod.GET)
-    public ModelAndView newAccount(ModelAndView model){
-       Account account = new Account();
-       model.addObject("account", account);
-       model.setViewName("admin/accountForm");
-       return model;
-    }
-
-    @RequestMapping(value = "accounts/newAccount", method = RequestMethod.POST)
-    public ModelAndView saveAccount(@Valid @ModelAttribute Account account, BindingResult result, SessionStatus status){
+    @RequestMapping(value = "ads/newAdvert", method = RequestMethod.POST)
+    public ModelAndView saveAdvert(@Valid @ModelAttribute Advert advert, BindingResult result, SessionStatus status){
         logger.info("Creating account");
-        Set<ConstraintViolation<Account>> violations = validator.validate(account);
-        for (ConstraintViolation<Account> violation : violations)
+        Set<ConstraintViolation<Advert>> violations = validator.validate(advert);
+        for (ConstraintViolation<Advert> violation : violations)
         {
             String propertyPath = violation.getPropertyPath().toString();
             String message = violation.getMessage();
@@ -79,35 +72,34 @@ public class AdvertController {
         }
         if (result.hasErrors()){
             logger.info("Returning to creation page");
-            return new ModelAndView("admin/accountForm");
+            return new ModelAndView("advertForm");
         }else {
-            accountDao.insertOrUpdate(account);
+            advertDao.addAdvert(advert);
             status.setComplete();
-            return new ModelAndView("redirect:admin/accounts");
+            return new ModelAndView("redirect:ads");
         }
     }
 
     @RequestMapping(value = "accounts/deleteAccount", method = RequestMethod.GET)
-    public ModelAndView deleteAccount(HttpServletRequest request) {
+    public ModelAndView deleteAdvert(HttpServletRequest request) {
         int accountId = Integer.parseInt(request.getParameter("id"));
-        accountDao.delete(accountId);
-        return new ModelAndView("redirect:admin/accounts");
+        advertDao.deleteAdvert(accountId);
+        return new ModelAndView("redirect:ads");
     }
 
-    @RequestMapping(value = "accounts/editAccount", method = RequestMethod.GET)
-    public ModelAndView editAccount(HttpServletRequest request){
-        int accountId = Integer.parseInt(request.getParameter("id"));
-        Account account = accountDao.get(accountId);
-        ModelAndView model = new ModelAndView("admin/accountForm");
-        model.addObject("account", account);
+    @RequestMapping(value = "ads/editAdvert", method = RequestMethod.GET)
+    public ModelAndView editAdvert(HttpServletRequest request){
+        int id = Integer.parseInt(request.getParameter("id"));
+        Advert advert = advertDao.getAdvertById(id);
+        ModelAndView model = new ModelAndView("advertForm");
+        model.addObject("advert", advert);
         return model;
     }
 
-    @RequestMapping(value = "accounts/editAccount", method = RequestMethod.POST)
-    public ModelAndView updateAccount(@ModelAttribute Account account){
-        accountDao.insertOrUpdate(account);
-        return new ModelAndView("redirect:admin/accounts");
+    @RequestMapping(value = "ads/editAdvert", method = RequestMethod.POST)
+    public ModelAndView updateAdvert(@ModelAttribute Advert advert){
+        advertDao.addAdvert(advert);
+        return new ModelAndView("redirect:ads");
     }
 
-     */
 }
