@@ -1,32 +1,28 @@
 package com.grinyov.bulletinboard.main;
 
-import com.grinyov.bulletinboard.config.DataConfig;
-import com.grinyov.bulletinboard.config.RootConfig;
 import com.grinyov.bulletinboard.config.SecurityConfig;
 import com.grinyov.bulletinboard.config.WebConfig;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
  * @author Vitaliy Grinyov
  * @since 2016
  */
-public class SpringWebAppInitializer implements WebApplicationInitializer {
+public class SpringWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-        appContext.register(SecurityConfig.class, RootConfig.class, DataConfig.class, WebConfig.class);
-
-        ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
-                "SpringDispatcher", new DispatcherServlet(appContext));
-        dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");
-
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class<?>[] {SecurityConfig.class };
     }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class<?>[] { WebConfig.class };
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/" };
+    }
+
 }

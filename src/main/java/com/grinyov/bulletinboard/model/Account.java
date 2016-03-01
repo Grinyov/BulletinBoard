@@ -2,6 +2,7 @@ package com.grinyov.bulletinboard.model;
 
 import org.hibernate.validator.constraints.Email;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -13,10 +14,15 @@ import java.io.Serializable;
  *
  * Entity used to store information about users.
  */
+@Entity
+@Table(name = "accounts", schema = "", catalog = "bulletin_board")
+@NamedQueries({
+        @NamedQuery(name = "Account.findAll", query = "SELECT a FROM Account a"),
+        @NamedQuery(name = "Account.findByName", query = "SELECT a FROM Account a WHERE a.name = :name")})
 public class Account implements Serializable {
 
     private static final long serialVersionUID = 409793453581901624L;
-    private long id;
+    private int id;
     @NotNull(message = "Name can't be empty.")
     @Size(min = 3, max = 255, message = "Your name must be between 3 and 255 characters long.")
     @Pattern(regexp="^[a-zA-Z0-9]+$", message="Name must be alphanumeric with no spaces.")
@@ -31,21 +37,23 @@ public class Account implements Serializable {
 
     public Account(){}
 
-    public Account(long id, String name, String email, String password) {
+    public Account(int id, String name, String email, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
     }
-
-    public long getId() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "account_id")
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
-
+    @Column(name = "name")
     public String getName() {
         return name;
     }
@@ -53,7 +61,7 @@ public class Account implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
+    @Column(name = "email")
     public String getEmail() {
         return email;
     }
@@ -61,7 +69,7 @@ public class Account implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-
+    @Column(name = "password")
     public String getPassword() {
         return password;
     }

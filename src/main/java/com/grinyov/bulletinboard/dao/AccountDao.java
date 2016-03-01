@@ -8,11 +8,12 @@ import java.util.List;
  * @author Vitaliy Grinyov
  * @since 2016
  */
+
 public interface AccountDao {
 
     public void insertOrUpdate(Account account);
 
-    public void delete(String name);
+    public void delete(int id);
 
     public Account get(String name);
 

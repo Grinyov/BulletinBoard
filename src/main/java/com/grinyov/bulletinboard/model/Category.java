@@ -13,10 +13,10 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "categories", schema = "", catalog = "bulletin_board")
-@NamedQueries({
+/*@NamedQueries({
 @NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c"),
 @NamedQuery(name = "Category.findById", query = "SELECT c FROM Category c WHERE c.categoryId = :categoryId")}
-)
+)*/
 public class Category implements Serializable{
 
     private static final long serialVersionUID = -2371179084452708204L;
@@ -32,7 +32,7 @@ public class Category implements Serializable{
         this.name = name;
     }
     @Basic
-    @Column(name = "name", nullable = false, insertable = true, updatable = true)
+    @Column(name = "name")
     public String getName() {
         return name;
     }
@@ -41,8 +41,8 @@ public class Category implements Serializable{
         this.name = name;
     }
     @Id
-    @GeneratedValue
-    @Column(name = "category_id", nullable = false, insertable = true, updatable = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "category_id")
     public long getId() {
         return id;
     }

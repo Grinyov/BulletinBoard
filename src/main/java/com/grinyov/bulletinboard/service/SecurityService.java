@@ -18,7 +18,7 @@ import java.util.Set;
  * @author Vitaliy Grinyov
  * @since 2016
  */
-@Service
+@Service("securityService")
 public class SecurityService implements UserDetailsService {
 
     @Autowired
@@ -27,7 +27,6 @@ public class SecurityService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String name) throws NoSuchAccountException {
 
-        //Account account = accountDao.get(name);
         Account account = accountDao.get(name);
         // roles
         Set<GrantedAuthority> roles = new HashSet();

@@ -1,8 +1,5 @@
 package com.grinyov.bulletinboard.config;
 
-import com.grinyov.bulletinboard.model.Account;
-import com.grinyov.bulletinboard.model.Advert;
-import com.grinyov.bulletinboard.model.Category;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +43,12 @@ public class DataConfig {
 
     @Autowired
     @Bean(name = "sessionFactory")
+	@SuppressWarnings("deprecation")
     public SessionFactory getSessionFactory(DataSource dataSource) {
     	LocalSessionFactoryBuilder sessionBuilder = new LocalSessionFactoryBuilder(dataSource);
     	sessionBuilder.addProperties(getHibernateProperties());
-    	sessionBuilder.addAnnotatedClasses(Advert.class, Account.class, Category.class);
+    	//sessionBuilder.addAnnotatedClasses(Advert.class, Account.class, Category.class);
+		sessionBuilder.scanPackages("com.grinyov.bulletinboard");
     	return sessionBuilder.buildSessionFactory();
     }
 
