@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<!--<div th:fragment="nav">-->
+<div th:include="ads :: nav" ></div>
 
 <div class="container">
     <div class="row">
@@ -29,7 +29,7 @@
         <div class="col-md-10">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Message</h3>
+                    <h3 class="panel-title">Advert</h3>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
             </div>
             <div class="col-md-10">
                 <div class="panel panel-default">
-                    <div class="panel-heading">composed on: ${advert.date} Topic: ${advert.category}</div>
+                    <div class="panel-heading">published on: ${advert.date} Topic: ${advert.category}</div>
                     <div class="panel-body">
                         <h1>${advert.title}</h1>
                         ${advert.text}

@@ -14,13 +14,12 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "ads", schema = "", catalog = "bulletin_board")
-/*@NamedQueries({
-        @NamedQuery(name = "Advert.findAll", query = "SELECT a FROM Advert a"),
-        @NamedQuery(name = "Advert.findByPattern", query = "SELECT a FROM Advert a WHERE a.shortDesc " +
+@NamedQueries({
+       /* @NamedQuery(name = "Advert.findByPattern", query = "SELECT a FROM Advert a WHERE a.shortDesc " +
                 "LIKE :pattern OR a.contact.name LIKE :pattern"),
         @NamedQuery(name = "Advert.findByCategory", query = "SELECT a FROM Advert a " +
-                "WHERE a.category.id = :categoryId AND a.top = FALSE"),
-        @NamedQuery(name = "Advert.findById", query = "SELECT a FROM Advert a WHERE a.id = :id")})*/
+                "WHERE a.category.id = :categoryId AND a.top = FALSE"),*/
+        @NamedQuery(name = "Advert.findById", query = "SELECT a FROM Advert a WHERE a.id = :id")})
 public class Advert implements Serializable {
 
     private static final long serialVersionUID = 6935513514218522345L;
