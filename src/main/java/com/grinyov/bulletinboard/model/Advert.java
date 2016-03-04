@@ -16,6 +16,11 @@ import java.sql.Timestamp;
 @Table(name = "ads", schema = "", catalog = "bulletin_board")
 @NamedQueries({
         @NamedQuery(name = "Advert.findAll", query = "SELECT a FROM Advert a"),
+        @NamedQuery(name = "Advert.findTop", query = "SELECT a FROM Advert a WHERE a.top = TRUE"),
+        @NamedQuery(name = "Advert.findByPattern", query = "SELECT a FROM Advert a WHERE a.title " +
+                "LIKE :pattern OR a.account.name LIKE :pattern"),
+        @NamedQuery(name = "Advert.findByCategory", query = "SELECT a FROM Advert a " +
+                "WHERE a.category.id = :categoryId AND a.top = FALSE"),
         @NamedQuery(name = "Advert.findById", query = "SELECT a FROM Advert a WHERE a.id = :id")})
 public class Advert implements Serializable {
 
