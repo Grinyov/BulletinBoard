@@ -5,6 +5,7 @@ import com.grinyov.bulletinboard.dao.CategoryDao;
 import com.grinyov.bulletinboard.model.Advert;
 import com.grinyov.bulletinboard.model.Category;
 import com.grinyov.bulletinboard.util.AdvertComparator;
+import com.grinyov.bulletinboard.util.HtmlSpecialChars;
 import com.grinyov.bulletinboard.util.Pagination;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +23,7 @@ import java.util.List;
  * @since 2016
  */
 @Controller
-public class MainController {
+public class SearchController {
     @Autowired
     private AdvertDao advertDao;
 
@@ -34,8 +33,11 @@ public class MainController {
     @Autowired
     private Pagination pagination;
 
-    @Value("${page_title.index}")
-    private String indexPageTitle;
+    //@Autowired
+    private HtmlSpecialChars htmlSpecialChars;
+
+    @Value("${page_title.search}")
+    private String searchPageTitle;
 
     @Value("${title.sort_by_id}")
     private String sortByIdTitle;
@@ -52,25 +54,36 @@ public class MainController {
       */
     private static final StringBuilder urlPrefix = new StringBuilder();
 
-    @RequestMapping({"/", "/index"})
-    public String main(@RequestParam(value = "page", required = false) String pageIdStr,
+    @RequestMapping("/search")
+    public String main(@RequestParam(value = "q", required = false) String searchQuery,
+                       @RequestParam(value = "page", required = false) String pageIdStr,
                        @RequestParam(value = "sort", required = false) String sortBy,
                        @RequestParam(value = "category", required = false) String categoryIdStr,
                        ModelMap model) {
 
-        final List<Advert> allAdverts = advertDao.getAllAdverts();
-        List<Advert> regularAdv = new ArrayList<>();
+        List<Advert> adverts;
 
-        // timestamp formatting
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        if (StringUtils.isNotBlank(searchQuery)) {
+            // avoiding double quotes
+            searchQuery = htmlSpecialChars.replaceChars(searchQuery);
+            adverts = advertDao.searchAdvert(searchQuery);
+            for (Advert advert : adverts) {
+                advert.getPublication();
+            }
+        } else {
+            return "redirect:/";
+        }
 
-        urlPrefix.append("?");
+        if (adverts.size() == 0) {
+            urlPrefix.append("/?");
+        } else {
+            urlPrefix.append("?q=").append(searchQuery).append("&amp;");
+        }
 
         String categoryUrlPrefix = urlPrefix.toString();
-        String sortUrlPrefix = null;
-        String pageUrlPrefix = null;
+        String sortUrlPrefix;
+        String pageUrlPrefix;
 
-        // categories
         final List<Category> categories = categoryDao.getAllCategories();
 
         int categoryId = 0;
@@ -78,7 +91,7 @@ public class MainController {
             try {
                 categoryId = Integer.parseInt(categoryIdStr);
                 if (categoryId >= 1 && categoryId <= categories.size()) {
-                    regularAdv = advertDao.getAdvertsByCategoryId(categoryId);
+                    adverts = advertDao.getAdvertsByCategoryId(categoryId);
                     sortUrlPrefix = urlPrefix.append("category=").append(categoryId).append("&amp;").toString();
                 } else
                     throw new NumberFormatException();
@@ -89,7 +102,6 @@ public class MainController {
             sortUrlPrefix = categoryUrlPrefix;
         }
 
-        // sorting
         String sortByTitle = null;
 
         if (StringUtils.isNotBlank(sortBy)) {
@@ -98,12 +110,12 @@ public class MainController {
                 case "id":
                     pageUrlPrefix = urlPrefix.append("id&amp;").toString();
                     sortByTitle = sortByIdTitle;
-                    Collections.sort(regularAdv, AdvertComparator.COMPARE_BY_ID);
+                    Collections.sort(adverts, AdvertComparator.COMPARE_BY_ID);
                     break;
                 case "date":
                     pageUrlPrefix = urlPrefix.append("date&amp;").toString();
                     sortByTitle = sortByDateTitle;
-                    Collections.sort(regularAdv, AdvertComparator.COMPARE_BY_DATE);
+                    Collections.sort(adverts, AdvertComparator.COMPARE_BY_DATE);
                     break;
                 default:
                     pageUrlPrefix = sortUrlPrefix;
@@ -116,11 +128,11 @@ public class MainController {
 
         urlPrefix.setLength(0);
 
-        if (regularAdv.size() == 0) {
+        if (adverts.size() == 0) {
             model.addAttribute("error", "true");
         } else {
             // pagination
-            int pagesCount = pagination.getPagesNumber(regularAdv);
+            int pagesCount = pagination.getPagesNumber(adverts);
             int pageId = 1; // default page number
 
             try {
@@ -140,9 +152,10 @@ public class MainController {
 
             model.addAttribute("pagesCount", pagesCount);
             model.addAttribute("currentPageId", pageId);
-            model.addAttribute("regular_annc", pagination.getItemsPerPage(regularAdv, pageId));
+            model.addAttribute("annc", pagination.getItemsPerPage(adverts, pageId));
         }
 
+        model.addAttribute("search", searchQuery);
         model.addAttribute("currentCategoryId", categoryId);
         model.addAttribute("categoryUrlPrefix", categoryUrlPrefix);
         model.addAttribute("sortUrlPrefix", sortUrlPrefix);
@@ -150,9 +163,8 @@ public class MainController {
         model.addAttribute("pageUrlPrefix", pageUrlPrefix);
         model.addAttribute("categories", categories);
 
-        model.addAttribute("index_active", "active");
-        model.addAttribute("page", "index");
-        model.addAttribute("page_title", indexPageTitle);
+        model.addAttribute("page", "search");
+        model.addAttribute("page_title", searchPageTitle);
 
         return "page";
     }

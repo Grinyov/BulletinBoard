@@ -14,9 +14,11 @@
         <springframework.version>4.1.7.RELEASE</springframework.version>
         <spring-security>4.0.3.RELEASE</spring-security>
         <hibernate.version>4.3.10.Final</hibernate.version>
+        <hibernate-jpa>1.0.0.Final</hibernate-jpa>
         <commons-dbcp2>2.1.1</commons-dbcp2>
         <mysql-connector-java>5.1.30</mysql-connector-java>
         <javax.servlet-api>3.0.1</javax.servlet-api>
+        <jsp-api>2.2</jsp-api>
         <thymeleaf-extras-springsecurity4>2.1.2.RELEASE</thymeleaf-extras-springsecurity4>
         <thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
         <bootstrap>3.3.4</bootstrap>
@@ -98,7 +100,11 @@
             <version>${thymeleaf.version}</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>${jsp-api}</version>
+        </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
@@ -113,7 +119,18 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet-api}</version>
-            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
         </dependency>
 
         <dependency>
@@ -127,7 +144,11 @@
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>${hibernate-jpa}</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

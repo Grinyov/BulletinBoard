@@ -1,24 +1,21 @@
 package com.grinyov.bulletinboard.controller;
 
+import com.grinyov.bulletinboard.dao.AccountDao;
 import com.grinyov.bulletinboard.dao.AdvertDao;
-import com.grinyov.bulletinboard.exception.NoSuchAdvertException;
+import com.grinyov.bulletinboard.dao.CategoryDao;
 import com.grinyov.bulletinboard.model.Advert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.grinyov.bulletinboard.util.HtmlSpecialChars;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.*;
-import java.util.List;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.*;
 
 
 /**
@@ -28,78 +25,112 @@ import java.util.Set;
 @Controller
 public class AdvertController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdvertController.class);
 
     @Autowired
     private AdvertDao advertDao;
 
-    private Validator validator;
+    @Autowired
+    private CategoryDao categoryDao;
 
-    public AdvertController(){
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
-    }
+    @Autowired
+    private AccountDao accountDao;
 
-    @RequestMapping(value = "ads")
-    public ModelAndView listAds(ModelAndView model) throws NoSuchAdvertException {
-        List<Advert> ads = advertDao.getAllAds();
-        model.addObject("ads", ads);
-        model.setViewName("ads");
-        return model;
-    }
+    @Autowired
+    private HtmlSpecialChars htmlSpecialChars;
 
-    @RequestMapping(value = "ads/newAdvert", method = RequestMethod.GET)
-    public ModelAndView newAdvert(ModelAndView model){
-        Advert advert = new Advert();
-        model.addObject("advert", advert);
-        model.setViewName("advertForm");
-        return model;
-    }
+    @Value("${page_title.new_ann}")
+    private String newAnnPageTitle;
 
-    @RequestMapping(value = "ads/newAdvert", method = RequestMethod.POST)
-    public ModelAndView saveAdvert(@Valid @ModelAttribute Advert advert, BindingResult result, SessionStatus status){
-        logger.info("Creating account");
-        Set<ConstraintViolation<Advert>> violations = validator.validate(advert);
-        for (ConstraintViolation<Advert> violation : violations)
-        {
-            String propertyPath = violation.getPropertyPath().toString();
-            String message = violation.getMessage();
-            // Add JSR-303 errors to BindingResult
-            // This allows Spring to display them in view via a FieldError
-            result.addError(new FieldError("account",propertyPath,
+    @Value("${error.empty_fields_detected}")
+    private String errorEmptyFieldsDetected;
 
-                    "Invalid "+ propertyPath + "(" + message + ")"));
+    @Value("${error.incorrect_price}")
+    private String errorIncorrectPrice;
+
+    @Value("${error.incorrect_category}")
+    private String errorIncorrectCategory;
+
+    @Value("${error.incorrect_contact}")
+    private String errorIncorrectContact;
+
+    @Value("${error.add_annc_error}")
+    private String errorFatal;
+
+    private List<String> errors = new ArrayList<>();
+    private Map<String, String> paramMap = new HashMap<>();
+
+    @RequestMapping("/new_advert")
+    public String main(ModelMap model) {
+
+        if (errors.size() != 0) {
+            model.addAttribute("errors", errors);
+            model.addAllAttributes(paramMap);
+            errors = new ArrayList<>();
+            paramMap = new HashMap<>();
         }
-        if (result.hasErrors()){
-            logger.info("Returning to creation page");
-            return new ModelAndView("advertForm");
-        }else {
-            advertDao.addAdvert(advert);
-            status.setComplete();
-            return new ModelAndView("redirect:ads");
+
+        model.addAttribute("categories", categoryDao.getAllCategories());
+        model.addAttribute("categoryUrlPrefix", "/?");
+
+        model.addAttribute("page", "new_ann");
+        model.addAttribute("newann_active", "active");
+        model.addAttribute("page_title", newAnnPageTitle);
+
+        return "page";
+    }
+
+    @RequestMapping(value = "/new_advert", method = RequestMethod.POST)
+    public String createAnn(@RequestParam(value = "account", required = false) String accountStr,
+                            @RequestParam(value = "category", required = false) String category,
+                            @RequestParam(value = "title", required = false) String title,
+                            @RequestParam(value = "text", required = false) String text,
+                            @RequestParam(value = "publication", required = false) String publication
+                            ) {
+
+        paramMap.put("account", accountStr);
+        paramMap.put("category", category);
+        paramMap.put("title", title);
+        paramMap.put("text", text);
+        paramMap.put("publication", publication);
+
+
+        if (StringUtils.isBlank(category)
+                || StringUtils.isBlank(accountStr)
+                || StringUtils.isBlank(title)
+                || StringUtils.isBlank(text)
+                || StringUtils.isBlank(publication)) {
+            errors.add(errorEmptyFieldsDetected);
+            return "redirect:/new_announcement";
         }
-    }
 
-    @RequestMapping(value = "accounts/deleteAccount", method = RequestMethod.GET)
-    public ModelAndView deleteAdvert(HttpServletRequest request) {
-        int accountId = Integer.parseInt(request.getParameter("id"));
-        advertDao.deleteAdvert(accountId);
-        return new ModelAndView("redirect:ads");
-    }
+        // avoiding unwanted html characters
+        accountStr = htmlSpecialChars.replaceChars(accountStr);
+        category = htmlSpecialChars.replaceChars(category);
+        title = htmlSpecialChars.replaceChars(title);
+        text = htmlSpecialChars.replaceChars(text);
+        int categoryId = 0;
+        String name = "";
 
-    @RequestMapping(value = "ads/editAdvert", method = RequestMethod.GET)
-    public ModelAndView editAdvert(HttpServletRequest request){
-        int id = Integer.parseInt(request.getParameter("id"));
-        Advert advert = advertDao.getAdvertById(id);
-        ModelAndView model = new ModelAndView("advertForm");
-        model.addObject("advert", advert);
-        return model;
-    }
 
-    @RequestMapping(value = "ads/editAdvert", method = RequestMethod.POST)
-    public ModelAndView updateAdvert(@ModelAttribute Advert advert){
-        advertDao.addAdvert(advert);
-        return new ModelAndView("redirect:ads");
+        // parsing category id
+        try {
+            categoryId = Integer.parseInt(category);
+            if (categoryId <= 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException ignored) {
+            errors.add(errorIncorrectCategory);
+        }
+
+
+        Advert advert = new Advert(accountDao.getAccountByName(name), categoryDao.getCategoryById(categoryId), title,
+                text, new Timestamp(new Date().getTime()));
+        if (!advertDao.addAdvert(advert)) {
+            errors.add(errorFatal);
+            return "redirect:/new_announcement";
+        }
+
+        return "redirect:/";
     }
 
 }

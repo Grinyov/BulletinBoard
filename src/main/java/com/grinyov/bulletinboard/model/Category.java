@@ -13,22 +13,22 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "categories", schema = "", catalog = "bulletin_board")
-/*@NamedQueries({
-@NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c"),
-@NamedQuery(name = "Category.findById", query = "SELECT c FROM Category c WHERE c.categoryId = :categoryId")}
-)*/
+@NamedQueries({
+        @NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c"),
+        @NamedQuery(name = "Category.findById", query = "SELECT c FROM Category c WHERE c.categoryId = :categoryId")}
+)
 public class Category implements Serializable{
 
     private static final long serialVersionUID = -2371179084452708204L;
-    private long id;
+    private long categoryId;
     @NotNull(message = "Name category can't be empty.")
     @Size(min = 3, max = 30, message = "Name category size must be between 3 and 30 characters long.")
     private String name;
 
     public Category(){}
 
-    public Category(long id, String name) {
-        this.id = id;
+    public Category(long categoryId, String name) {
+        this.categoryId = categoryId;
         this.name = name;
     }
     @Basic
@@ -44,11 +44,11 @@ public class Category implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     public long getId() {
-        return id;
+        return categoryId;
     }
 
     public void setId(long id) {
-        this.id = id;
+        this.categoryId = id;
     }
 
     @Override
@@ -58,14 +58,14 @@ public class Category implements Serializable{
 
         Category category = (Category) o;
 
-        if (id != category.id) return false;
+        if (categoryId != category.categoryId) return false;
         return name != null ? name.equals(category.name) : category.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = (int) (categoryId ^ (categoryId >>> 32));
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
@@ -73,7 +73,8 @@ public class Category implements Serializable{
     @Override
     public String toString() {
         return "Category{" +
-                "id=" + id +
+                "id=" + categoryId
+                +
                 ", name='" + name + '\'' +
                 '}';
     }

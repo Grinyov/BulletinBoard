@@ -1,12 +1,12 @@
 package com.grinyov.bulletinboard.dao;
 
 import com.grinyov.bulletinboard.model.Advert;
-import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -16,51 +16,96 @@ import java.util.List;
 @Repository("advertDao")
 public class AdvertDaoImpl implements AdvertDao{
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    private EntityManager em;
 
-    public AdvertDaoImpl() {}
+    private EntityManager getEm() {
+        if (em == null) {
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("BulletinBoard");
+            em = emf.createEntityManager();
+        }
+        return em;
+    }
 
-    public AdvertDaoImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Advert> getAllAdverts() {
+        return getEm().createNamedQuery("Advert.findAll", Advert.class).getResultList();
     }
 
     @Override
-    @Transactional
-    public List<Advert> getAllAds() {
-        @SuppressWarnings("unchecked")
-        List<Advert> listAdvert = (List<Advert>) sessionFactory.getCurrentSession().createCriteria(Advert.class)
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
-
-        return listAdvert;
+    public List<Advert> getTopAdverts() {
+        TypedQuery<Advert> query = getEm().createNamedQuery("Advert.findTop", Advert.class);
+        return query.getResultList();
     }
 
     @Override
-    @Transactional
-    public List<Advert> getAdsByCategoryId(int categoryId) {
-        return null;
+    public List<Advert> getAdvertsByCategoryId(int categoryId) {
+        TypedQuery<Advert> query = getEm().createNamedQuery("Advert.findByCategory", Advert.class);
+        query.setParameter("categoryId", categoryId);
+        return query.getResultList();
     }
 
-    @Override
-    @Transactional
-    public Advert getAdvertById(int id) {
-        return (Advert) sessionFactory.getCurrentSession().getNamedQuery("Advert.findById")
-                .setParameter("id", id).uniqueResult();
-    }
 
     @Override
-    @Transactional
-    public boolean addAdvert(Advert advert) {
-        return false;
+    public boolean addAdvert(Advert Advert) {
+        try {
+            getEm().getTransaction().begin();
+            getEm().persist(Advert);
+            getEm().getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            getEm().getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        }
+
     }
 
     @Override
     public List<Advert> searchAdvert(String pattern) {
-        return null;
+        TypedQuery<Advert> query = getEm().createNamedQuery("Advert.findByPattern", Advert.class);
+        query.setParameter("pattern", "%" + pattern + "%");
+        return query.getResultList();
     }
 
     @Override
     public boolean deleteAdvert(long id) {
-        return false;
+        try {
+            getEm().getTransaction().begin();
+            Advert Advert = getEm().find(Advert.class, id);
+            if (Advert != null) {
+                getEm().remove(Advert);
+            }
+            getEm().getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            getEm().getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public void deleteAdverts(long[] ids) {
+        try {
+            getEm().getTransaction().begin();
+            Advert Advert;
+            for (long idx : ids) {
+                Advert = getEm().find(Advert.class, idx);
+                if (Advert != null) {
+                    getEm().remove(Advert);
+                }
+            }
+            getEm().getTransaction().commit();
+        } catch (Exception e) {
+            getEm().getTransaction().rollback();
+            e.printStackTrace();
+        }
+    }
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (em != null)
+            em.close();
     }
 }

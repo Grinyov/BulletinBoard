@@ -17,6 +17,8 @@ import java.util.Set;
 /**
  * @author Vitaliy Grinyov
  * @since 2016
+ *
+ * Is a service class for encoding password
  */
 @Service("securityService")
 public class SecurityService implements UserDetailsService {
@@ -27,7 +29,7 @@ public class SecurityService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String name) throws NoSuchAccountException {
 
-        Account account = accountDao.get(name);
+        Account account = accountDao.getAccountByName(name);
         // roles
         Set<GrantedAuthority> roles = new HashSet();
         if (account.getName().equals("admin")){
